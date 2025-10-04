@@ -6,55 +6,37 @@ from PIL import Image, ImageTk
 
 class ColorDetectorApp:
     """
-    A GUI application for detecting specific colors in an image using HSV color space.
-    The user can load an image, click to select a color, and then fine-tune the
-    detection parameters with sliders for live feedback.
+    A GUI application for detecting electrical components. Users can click a color
+    and then use sliders to fine-tune the HSV range, component area, and shape
+    to isolate specific parts. The control panel is scrollable and slider ranges
+    adapt to the loaded image size.
     """
     def __init__(self, root):
         self.root = root
-        self.root.title("Advanced Component Color Detector")
+        self.root.title("Advanced Component Detector")
         self.root.configure(bg="#2E2E2E")
 
         # --- Instance Variables ---
         self.original_image = None
         self.hsv_image = None
-        self.hsv_color = None
-        self.sensitivity = 15 # Initial hue sensitivity
+        self.sensitivity = 15 # Initial hue sensitivity for color picking
 
         # --- Main Layout Frames ---
-        # Top bar for loading
         top_frame = tk.Frame(root, bg="#3C3C3C", padx=10, pady=10)
         top_frame.pack(side=tk.TOP, fill=tk.X)
-
-        # --- FIX: Use a PanedWindow for a stable, resizable layout ---
         main_pane = tk.PanedWindow(root, orient=tk.HORIZONTAL, bg="#2E2E2E", sashwidth=8, sashrelief=tk.RAISED)
         main_pane.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-
-        # Image panels on the left pane
         image_frame = tk.Frame(main_pane, bg="#2E2E2E", padx=10, pady=10)
         main_pane.add(image_frame, stretch="always")
-
-        # Controls/sliders on the right pane
         controls_frame = tk.Frame(main_pane, bg="#3C3C3C", padx=15, pady=15)
         main_pane.add(controls_frame, stretch="never")
         
         # --- Top Bar Widgets ---
-        self.btn_load = tk.Button(
-            top_frame, text="Load Image", command=self.load_image,
-            bg="#555555", fg="white", relief="flat", padx=10, pady=5
-        )
+        self.btn_load = tk.Button(top_frame, text="Load Image", command=self.load_image, bg="#555555", fg="white", relief="flat", padx=10, pady=5)
         self.btn_load.pack(side=tk.LEFT, padx=5)
-        self.info_label = tk.Label(
-            top_frame, text="Click on the image to pick a color.",
-            bg="#3C3C3C", fg="white"
-        )
+        self.info_label = tk.Label(top_frame, text="Load an image and click on a color to begin.", bg="#3C3C3C", fg="white")
         self.info_label.pack(side=tk.LEFT, padx=10)
-        self.hsv_display_label = tk.Label(
-            top_frame, text="Selected HSV: None",
-            bg="#3C3C3C", fg="#A9A9A9"
-        )
-        self.hsv_display_label.pack(side=tk.RIGHT, padx=10)
-
+        
         # --- Image Display Panels ---
         self.panel_original = tk.Label(image_frame, bg="#2E2E2E")
         self.panel_original.pack(side=tk.LEFT, padx=10, pady=5, expand=True)
@@ -62,46 +44,59 @@ class ColorDetectorApp:
         self.panel_mask = tk.Label(image_frame, bg="#2E2E2E")
         self.panel_mask.pack(side=tk.RIGHT, padx=10, pady=5, expand=True)
         tk.Label(image_frame, text="Original Image", bg="#2E2E2E", fg="white").place(in_=self.panel_original, relx=0.5, y=-20, anchor='n')
-        tk.Label(image_frame, text="Processed Mask", bg="#2E2E2E", fg="white").place(in_=self.panel_mask, relx=0.5, y=-20, anchor='n')
+        tk.Label(image_frame, text="Filtered Mask", bg="#2E2E2E", fg="white").place(in_=self.panel_mask, relx=0.5, y=-20, anchor='n')
 
-        # --- Controls Panel (Sliders) ---
-        self.create_control_sliders(controls_frame)
+        # --- Controls Panel ---
+        self.create_filter_controls(controls_frame)
 
-    def create_control_sliders(self, parent):
-        """Creates all the sliders for HSV and filtering."""
-        s = ttk.Style()
-        s.configure("TScale", background="#3C3C3C", foreground="white")
+    def create_filter_controls(self, parent):
+        """Creates all the sliders for filtering within a scrollable frame."""
+        # Create a canvas and a vertical scrollbar to hold the controls
+        canvas = tk.Canvas(parent, bg="#3C3C3C", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg="#3C3C3C")
 
-        tk.Label(parent, text="HSV Fine-Tuning", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(0, 10))
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
 
-        # Hue Sliders
-        tk.Label(parent, text="Hue (H)", bg="#3C3C3C", fg="white").pack()
-        self.h_lower_slider = tk.Scale(parent, from_=0, to=179, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.h_lower_slider.pack()
-        self.h_upper_slider = tk.Scale(parent, from_=0, to=179, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.h_upper_slider.pack(pady=(0, 15))
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
 
-        # Saturation Sliders
-        tk.Label(parent, text="Saturation (S)", bg="#3C3C3C", fg="white").pack()
-        self.s_lower_slider = tk.Scale(parent, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.s_lower_slider.pack()
-        self.s_upper_slider = tk.Scale(parent, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.s_upper_slider.pack(pady=(0, 15))
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
-        # Value Sliders
-        tk.Label(parent, text="Value (V)", bg="#3C3C3C", fg="white").pack()
-        self.v_lower_slider = tk.Scale(parent, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.v_lower_slider.pack()
-        self.v_upper_slider = tk.Scale(parent, from_=0, to=255, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.v_upper_slider.pack(pady=(0, 25))
+        # --- Now, place all widgets into the scrollable_frame ---
+        # We re-assign 'parent' to this frame for convenience
+        parent = scrollable_frame
+        
+        # --- HSV Controls ---
+        tk.Label(parent, text="Color Tuning (HSV)", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(0, 10), anchor='w')
+        self.h_lower_slider = self.create_slider(parent, "Hue (H) Lower", 0, 179)
+        self.h_upper_slider = self.create_slider(parent, "Hue (H) Upper", 0, 179)
+        self.s_lower_slider = self.create_slider(parent, "Saturation (S) Lower", 0, 255)
+        self.s_upper_slider = self.create_slider(parent, "Saturation (S) Upper", 0, 255)
+        self.v_lower_slider = self.create_slider(parent, "Value (V) Lower", 0, 255)
+        self.v_upper_slider = self.create_slider(parent, "Value (V) Upper", 0, 255)
+        
+        # --- Shape & Size Controls ---
+        tk.Label(parent, text="Shape & Size Filters", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(20, 10), anchor='w')
+        self.min_area_slider = self.create_slider(parent, "Min Area", 0, 5000)
+        self.min_area_slider.set(100)
+        self.max_area_slider = self.create_slider(parent, "Max Area", 0, 50000)
+        self.max_area_slider.set(20000)
+        self.min_aspect_slider = self.create_slider(parent, "Min Aspect Ratio (W/H)", 0, 100)
+        self.min_aspect_slider.set(1)
+        self.max_aspect_slider = self.create_slider(parent, "Max Aspect Ratio (W/H)", 0, 100)
+        self.max_aspect_slider.set(50)
 
-        # Filter Control
-        tk.Label(parent, text="Mask Filtering", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(10, 10))
-        tk.Label(parent, text="Min Thickness (pixels)", bg="#3C3C3C", fg="white").pack()
-        self.min_thickness_slider = tk.Scale(parent, from_=0, to=50, orient=tk.HORIZONTAL, command=self.update_mask, bg="#555", fg="white", troughcolor="#2E2E2E", length=200)
-        self.min_thickness_slider.set(5) # Default value
-        self.min_thickness_slider.pack()
-
+    def create_slider(self, parent, label_text, from_, to):
+        tk.Label(parent, text=label_text, bg="#3C3C3C", fg="white").pack(pady=(10,0), anchor='w')
+        slider = tk.Scale(parent, from_=from_, to=to, orient=tk.HORIZONTAL, command=self.apply_filters, bg="#555", fg="white", troughcolor="#2E2E2E", length=220)
+        slider.pack(anchor='w')
+        return slider
+        
     def load_image(self):
         path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp")])
         if not path: return
@@ -109,92 +104,87 @@ class ColorDetectorApp:
             self.original_image = cv2.imread(path)
             if self.original_image is None: raise ValueError("Could not read image.")
             self.hsv_image = cv2.cvtColor(self.original_image, cv2.COLOR_BGR2HSV)
-            self.hsv_color = None
-            self.hsv_display_label.config(text="Selected HSV: None")
+
+            # --- Dynamically update slider ranges based on image size ---
+            h, w, _ = self.original_image.shape
+            total_area = h * w
+            max_area_limit = total_area // 4 # Sensible max: 1/4 of total pixels
+            
+            self.max_area_slider.config(to=max_area_limit)
+            self.max_area_slider.set(min(20000, max_area_limit)) # Keep old default if possible
+            
+            self.min_area_slider.config(to=max_area_limit // 10) # Max for the min slider
+            self.min_area_slider.set(100)
+
             self.display_image(self.original_image, self.panel_original)
-            self.panel_mask.config(image=''); self.panel_mask.image = ''
+            blank_mask = np.zeros(self.original_image.shape[:2], dtype="uint8")
+            self.display_image(blank_mask, self.panel_mask)
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load image: {e}")
 
     def pick_color(self, event):
         if self.hsv_image is None: return
-        
-        # Scale coordinates from display to original image size
+
         img_w, img_h = self.panel_original.image.width(), self.panel_original.image.height()
         orig_h, orig_w, _ = self.original_image.shape
-        orig_x = int(event.x * (orig_w / img_w))
-        orig_y = int(event.y * (orig_h / img_h))
-        orig_x = np.clip(orig_x, 0, orig_w - 1)
-        orig_y = np.clip(orig_y, 0, orig_h - 1)
-
-        self.hsv_color = self.hsv_image[orig_y, orig_x]
+        orig_x = int(event.x * (orig_w/img_w)); orig_y = int(event.y * (orig_h/img_h))
+        orig_x, orig_y = np.clip(orig_x, 0, orig_w - 1), np.clip(orig_y, 0, orig_h - 1)
         
-        # --- FIX: Convert numpy.uint8 to int to prevent overflow warnings/errors ---
-        h, s, v = map(int, self.hsv_color)
+        h, s, v = map(int, self.hsv_image[orig_y, orig_x])
         
-        self.hsv_display_label.config(text=f"Selected HSV: [{h}, {s}, {v}]")
-        
-        # Initialize sliders around the picked color (now with safe integer math)
         self.h_lower_slider.set(max(0, h - self.sensitivity))
         self.h_upper_slider.set(min(179, h + self.sensitivity))
-        self.s_lower_slider.set(max(0, s - 80))
-        self.s_upper_slider.set(min(255, s + 80))
-        self.v_lower_slider.set(max(0, v - 80))
-        self.v_upper_slider.set(min(255, v + 80))
+        self.s_lower_slider.set(max(0, s - 80)); self.s_upper_slider.set(min(255, s + 80))
+        self.v_lower_slider.set(max(0, v - 80)); self.v_upper_slider.set(min(255, v + 80))
+        
+    def apply_filters(self, _=None):
+        if self.original_image is None: return
 
-        self.update_mask()
-
-    def update_mask(self, _=None): # The argument is for the slider command
-        if self.hsv_image is None: return
-
-        # Get current values from sliders
         lower_bound = np.array([self.h_lower_slider.get(), self.s_lower_slider.get(), self.v_lower_slider.get()])
         upper_bound = np.array([self.h_upper_slider.get(), self.s_upper_slider.get(), self.v_upper_slider.get()])
-        
-        mask = cv2.inRange(self.hsv_image, lower_bound, upper_bound)
-        
-        # Post-processing to reduce noise
+        messy_mask = cv2.inRange(self.hsv_image, lower_bound, upper_bound)
+
         kernel = np.ones((5, 5), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+        messy_mask = cv2.morphologyEx(messy_mask, cv2.MORPH_OPEN, kernel, iterations=1)
+        messy_mask = cv2.morphologyEx(messy_mask, cv2.MORPH_CLOSE, kernel, iterations=1)
 
-        # Filter by thickness
-        min_thickness = self.min_thickness_slider.get()
-        if min_thickness > 0:
-            filtered_mask = np.zeros_like(mask)
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for cnt in contours:
-                x, y, w, h = cv2.boundingRect(cnt)
-                # Keep contours that are not too thin
-                if w >= min_thickness and h >= min_thickness:
-                    cv2.drawContours(filtered_mask, [cnt], -1, (255), -1)
-            mask = filtered_mask
+        contours, _ = cv2.findContours(messy_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        clean_mask = np.zeros_like(messy_mask)
+        min_area, max_area = self.min_area_slider.get(), self.max_area_slider.get()
+        min_aspect = self.min_aspect_slider.get() / 10.0
+        max_aspect = self.max_aspect_slider.get() / 10.0
 
-        self.display_image(mask, self.panel_mask)
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if not (min_area < area < max_area): continue
 
-    def display_image(self, img_data, panel):
-        max_height = 500
+            x, y, w, h = cv2.boundingRect(cnt)
+            if h == 0: continue
+            aspect_ratio = w / float(h)
+            if not (min_aspect < aspect_ratio < max_aspect): continue
+            
+            cv2.drawContours(clean_mask, [cnt], -1, 255, -1)
+        
+        self.display_image(clean_mask, self.panel_mask)
+
+    def display_image(self, img_data, panel, max_size=500):
         h, w = img_data.shape[:2]
-        if h > max_height:
-            ratio = max_height / h
+        if max(h, w) > max_size:
+            ratio = max_size / max(h, w)
             new_w, new_h = int(w * ratio), int(h * ratio)
             img_data = cv2.resize(img_data, (new_w, new_h), interpolation=cv2.INTER_AREA)
             
-        if len(img_data.shape) == 3:
-            img_data = cv2.cvtColor(img_data, cv2.COLOR_BGR2RGB)
+        if len(img_data.shape) == 3: img_data = cv2.cvtColor(img_data, cv2.COLOR_BGR2RGB)
         
-        img = Image.fromarray(img_data)
-        img_tk = ImageTk.PhotoImage(image=img)
-
-        panel.config(image=img_tk)
-        panel.image = img_tk
-
+        img = Image.fromarray(img_data); img_tk = ImageTk.PhotoImage(image=img)
+        panel.config(image=img_tk); panel.image = img_tk
 
 if __name__ == "__main__":
     try:
         root = tk.Tk()
         app = ColorDetectorApp(root)
-        root.geometry("1200x700") # Increased window size for controls
+        root.geometry("1200x700")
         root.mainloop()
     except ImportError:
         print("Error: Missing required libraries.")
