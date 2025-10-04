@@ -51,49 +51,40 @@ class ColorDetectorApp:
 
     def create_filter_controls(self, parent):
         """Creates all the sliders for filtering within a scrollable frame."""
-        # Create a canvas and a vertical scrollbar to hold the controls
         canvas = tk.Canvas(parent, bg="#3C3C3C", highlightthickness=0)
         scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
         scrollable_frame = tk.Frame(canvas, bg="#3C3C3C")
 
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
-
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
-
-        # --- Now, place all widgets into the scrollable_frame ---
-        # We re-assign 'parent' to this frame for convenience
+        
         parent = scrollable_frame
         
-        # --- HSV Controls ---
         tk.Label(parent, text="Color Tuning (HSV)", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(0, 10), anchor='w')
-        self.h_lower_slider = self.create_slider(parent, "Hue (H) Lower", 0, 179)
-        self.h_upper_slider = self.create_slider(parent, "Hue (H) Upper", 0, 179)
-        self.s_lower_slider = self.create_slider(parent, "Saturation (S) Lower", 0, 255)
-        self.s_upper_slider = self.create_slider(parent, "Saturation (S) Upper", 0, 255)
-        self.v_lower_slider = self.create_slider(parent, "Value (V) Lower", 0, 255)
-        self.v_upper_slider = self.create_slider(parent, "Value (V) Upper", 0, 255)
+        self.h_lower_slider = self.create_slider(parent, "Hue (H) Lower", 0, 179, self._h_lower_callback)
+        self.h_upper_slider = self.create_slider(parent, "Hue (H) Upper", 0, 179, self._h_upper_callback)
+        self.s_lower_slider = self.create_slider(parent, "Saturation (S) Lower", 0, 255, self._s_lower_callback)
+        self.s_upper_slider = self.create_slider(parent, "Saturation (S) Upper", 0, 255, self._s_upper_callback)
+        self.v_lower_slider = self.create_slider(parent, "Value (V) Lower", 0, 255, self._v_lower_callback)
+        self.v_upper_slider = self.create_slider(parent, "Value (V) Upper", 0, 255, self._v_upper_callback)
         
-        # --- Shape & Size Controls ---
         tk.Label(parent, text="Shape & Size Filters", font=("Helvetica", 12, "bold"), bg="#3C3C3C", fg="white").pack(pady=(20, 10), anchor='w')
-        self.min_area_slider = self.create_slider(parent, "Min Area", 0, 5000)
+        self.min_area_slider = self.create_slider(parent, "Min Area", 0, 5000, self._min_area_callback)
         self.min_area_slider.set(100)
-        self.max_area_slider = self.create_slider(parent, "Max Area", 0, 50000)
+        self.max_area_slider = self.create_slider(parent, "Max Area", 0, 50000, self._max_area_callback)
         self.max_area_slider.set(20000)
-        self.min_aspect_slider = self.create_slider(parent, "Min Aspect Ratio (W/H)", 0, 100)
+        self.min_aspect_slider = self.create_slider(parent, "Min Aspect Ratio (W/H)", 0, 100, self._min_aspect_callback)
         self.min_aspect_slider.set(1)
-        self.max_aspect_slider = self.create_slider(parent, "Max Aspect Ratio (W/H)", 0, 100)
+        self.max_aspect_slider = self.create_slider(parent, "Max Aspect Ratio (W/H)", 0, 100, self._max_aspect_callback)
         self.max_aspect_slider.set(50)
 
-    def create_slider(self, parent, label_text, from_, to):
+    def create_slider(self, parent, label_text, from_, to, command_func=None):
+        if command_func is None: command_func = self.apply_filters
         tk.Label(parent, text=label_text, bg="#3C3C3C", fg="white").pack(pady=(10,0), anchor='w')
-        slider = tk.Scale(parent, from_=from_, to=to, orient=tk.HORIZONTAL, command=self.apply_filters, bg="#555", fg="white", troughcolor="#2E2E2E", length=220)
+        slider = tk.Scale(parent, from_=from_, to=to, orient=tk.HORIZONTAL, command=command_func, bg="#555", fg="white", troughcolor="#2E2E2E", length=220)
         slider.pack(anchor='w')
         return slider
         
@@ -105,15 +96,12 @@ class ColorDetectorApp:
             if self.original_image is None: raise ValueError("Could not read image.")
             self.hsv_image = cv2.cvtColor(self.original_image, cv2.COLOR_BGR2HSV)
 
-            # --- Dynamically update slider ranges based on image size ---
             h, w, _ = self.original_image.shape
             total_area = h * w
-            max_area_limit = total_area // 4 # Sensible max: 1/4 of total pixels
-            
+            max_area_limit = total_area // 4
             self.max_area_slider.config(to=max_area_limit)
-            self.max_area_slider.set(min(20000, max_area_limit)) # Keep old default if possible
-            
-            self.min_area_slider.config(to=max_area_limit // 10) # Max for the min slider
+            self.max_area_slider.set(min(20000, max_area_limit))
+            self.min_area_slider.config(to=max_area_limit // 10)
             self.min_area_slider.set(100)
 
             self.display_image(self.original_image, self.panel_original)
@@ -137,6 +125,58 @@ class ColorDetectorApp:
         self.s_lower_slider.set(max(0, s - 80)); self.s_upper_slider.set(min(255, s + 80))
         self.v_lower_slider.set(max(0, v - 80)); self.v_upper_slider.set(min(255, v + 80))
         
+        self.apply_filters()
+        
+    def _min_area_callback(self, val):
+        min_val = int(val)
+        if min_val > self.max_area_slider.get(): self.max_area_slider.set(min_val)
+        self.apply_filters()
+
+    def _max_area_callback(self, val):
+        max_val = int(val)
+        if max_val < self.min_area_slider.get(): self.min_area_slider.set(max_val)
+        self.apply_filters()
+
+    def _min_aspect_callback(self, val):
+        min_val = int(val)
+        if min_val > self.max_aspect_slider.get(): self.max_aspect_slider.set(min_val)
+        self.apply_filters()
+
+    def _max_aspect_callback(self, val):
+        max_val = int(val)
+        if max_val < self.min_aspect_slider.get(): self.min_aspect_slider.set(max_val)
+        self.apply_filters()
+
+    def _h_lower_callback(self, val):
+        min_val = int(val)
+        if min_val > self.h_upper_slider.get(): self.h_upper_slider.set(min_val)
+        self.apply_filters()
+
+    def _h_upper_callback(self, val):
+        max_val = int(val)
+        if max_val < self.h_lower_slider.get(): self.h_lower_slider.set(max_val)
+        self.apply_filters()
+
+    def _s_lower_callback(self, val):
+        min_val = int(val)
+        if min_val > self.s_upper_slider.get(): self.s_upper_slider.set(min_val)
+        self.apply_filters()
+
+    def _s_upper_callback(self, val):
+        max_val = int(val)
+        if max_val < self.s_lower_slider.get(): self.s_lower_slider.set(max_val)
+        self.apply_filters()
+        
+    def _v_lower_callback(self, val):
+        min_val = int(val)
+        if min_val > self.v_upper_slider.get(): self.v_upper_slider.set(min_val)
+        self.apply_filters()
+
+    def _v_upper_callback(self, val):
+        max_val = int(val)
+        if max_val < self.v_lower_slider.get(): self.v_lower_slider.set(max_val)
+        self.apply_filters()
+
     def apply_filters(self, _=None):
         if self.original_image is None: return
 
