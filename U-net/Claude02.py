@@ -436,10 +436,9 @@ def interactive_segment(model_path, image_path):
 # Main execution
 if __name__ == "__main__":
     # Configuration
-    MODEL_PATH = "AttentionCustomUNet.h5"
-    # IMAGE_PATH = "test/imgs/c4_12.jpg"
-    IMAGE_PATH = "1.png"
-    
+    MODEL_PATH = "Models\\AttentionCustomUNet.h5"
+    IMAGE_PATH = "initial Pictures\\pcb.jpg"  # Change this to your test image path
+
     # Check if files exist
     if not os.path.exists(MODEL_PATH):
         print(f"Error: Model file '{MODEL_PATH}' not found!")
