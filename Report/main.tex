@@ -1,0 +1,750 @@
+\documentclass[11pt,a4paper,draft]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\setlength{\headheight}{14pt}
+\addtolength{\topmargin}{-2pt}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+% Header and Footer Setup
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Group 3 - Final Report}
+\lhead{Beko Europe Project}
+\rfoot{Page \thepage}
+
+\begin{document}
+
+% =============================================================================
+% TITLE PAGE
+% =============================================================================
+\begin{titlepage}
+    \centering
+    \thispagestyle{empty}
+
+    \vspace*{1cm}
+    
+    \includegraphics[width=0.35\textwidth]{polimi_logo.png} 
+    
+    \vspace{1.0cm}
+    
+    {\Large \textsc{Politecnico di Milano}\\ 
+    Department of Electronics, Information and Bioengineering (DEIB)\par}
+    
+    \vspace{3cm}
+    
+    {\Huge \textbf{Automated Visual Inspection System for PCB Connectors}\par}
+    \vspace{0.5cm}
+    {\Large \textbf{Project Work Report – Beko Europe}\par}
+    \vspace{0.5cm}
+    {\large Academic Year 2025–2026\par}
+    
+    \vspace{3cm}
+    
+    {\large \textbf{Authors:}\par}
+    \vspace{0.2cm}
+    {\large
+    Giovanni Passuello\\
+    Karim Negm\\
+    Feruzakhon Sulaymonova\\
+    Tingyu Chen\par}
+    
+    \vspace{1.5cm}
+    
+    {\large \textbf{Supervisor:} Prof. Fredy Ruiz\par}
+    \vspace{0.1cm}
+    {\large \textbf{Co-advisors:} Marco Cederle, Davide Cazzaniga\par}
+    
+    \vfill
+    
+    {\large February 2026\par}
+    
+\end{titlepage}
+
+\newpage
+
+% =============================================================================
+% TABLE OF CONTENTS
+% =============================================================================
+\tableofcontents
+\newpage
+
+% =============================================================================
+% REPORT BODY
+% =============================================================================
+
+\section{Executive Summary}
+
+This report presents the development of an automated visual inspection system for PCB connector assemblies at Beko Europe, culminating in a deployable software solution capable of detecting missing cable connections with \textbf{95.13\% overall accuracy}. The project addresses a critical industrial challenge: ensuring connection integrity in a production environment where defects are extremely rare ($<1\%$), rendering traditional supervised learning approaches impractical.
+
+Our solution evolved from initial hardware design to a robust \textbf{multi-stage pipeline}. By decomposing the inspection task into two specialized sub-problems—using a CNN to filter non-defective occlusions and an EfficientAD-based model for anomaly detection on visible connectors—we achieved a system that balances computational efficiency with industrial reliability.
+
+Developed in close collaboration with Beko Europe's engineering team, the final system integrates these models into a user-friendly graphical interface. The result is a practical, production-ready tool that addresses genuine manufacturing needs, demonstrating the effective application of modern computer vision in quality control.
+
+\section{Introduction and Problem Statement}
+
+\subsection{Industrial Context}
+
+For Beko Europe, ensuring secure PCB connections is a critical safety and reliability imperative. The primary motivation for implementing a vision-based system stems from the high cost of rework: if a missing connector is detected during final testing, the appliance often requires \textbf{full reassembly}, causing significant production bottlenecks. Internal analysis indicates these failures occur predominantly in the \textbf{upper panel assembly}, making this specific area the focus of our automated monitoring.
+
+Traditional human inspection, while effective for obvious defects, faces inherent limitations: operator fatigue over long shifts, high line speed allowing only brief inspection windows, and visual obstructions from overlapping cables. Beko's objective is not to replace human inspectors, but to deploy an automated system as a consistent, complementary quality assurance layer that mitigates human error and provides objective, repeatable verification.
+
+\subsection{Technical Challenges}
+
+From a computer vision and machine learning perspective, this task presents several non-trivial challenges:
+
+\textbf{Extreme Class Imbalance:} With a total of 173 boards yielding 1,557 total connector images. Among these, only 25 were genuine defects (KO cases)—a mere 0.9\% of the dataset. This extreme imbalance makes traditional supervised classification problematic, as models tend to simply predict "OK" for everything to minimize overall error.
+
+\textbf{Visual Ambiguity from Occlusions:} Non-defective occlusions represent 17\% of our dataset (485 images). Cables from other connections frequently pass in front of connectors, partially or fully blocking the view. These occlusions are visually similar to missing cables yet are not defects. A naive model might flag all occlusions as problematic, leading to unacceptably high false positive rates.
+w
+\textbf{Illumination and Perspective Variability:} Small variations in board positioning, ambient lighting throughout the day, and camera vibrations introduce variability that a robust system must handle gracefully.
+
+\textbf{Limited Training Data:} Our dataset of a few hundred images per connector type represents realistic industrial constraints. Extended production line monitoring for data collection has practical and economic limitations.
+
+\subsection{Project Objectives and Scope}
+
+Based on the identified challenges, the main objective of this project is to reliably detect the presence or absence of cable connections under real industrial conditions. Particular emphasis is placed on minimizing false negatives, as undetected defects represent a higher operational risk than triggering additional human inspection. The system is therefore designed to remain robust in the presence of visual occlusions, distinguishing between harmless obstructions and actual defects. 
+
+From a practical standpoint, the solution must be deployable on standard industrial PCs without relying on costly GPU infrastructure, ensuring feasibility for real production environments. In addition, scalability is considered a key requirement, allowing the approach to be adapted to different connector types without the need for a complete redesign.
+
+The project scope intentionally excludes the detection of partial insertions or cable seating depth. According to Beko engineers, connectors are mechanically designed to either accept cables correctly or reject them entirely, while rare intermediate cases are handled by downstream electrical testing.
+
+\section{System Design and Architecture}
+
+\subsection{Hardware Setup and Camera Configuration}
+
+\subsubsection{Initial Exploration: Stereo Vision}
+
+Our initial approach considered stereo vision to provide depth information distinguishing cables passing in front of connectors versus those actually inserted. We implemented a proof-of-concept demonstrating that depth maps could be computed effectively.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/stereo_setup_diagram.png}
+        \caption{Stereo camera configuration}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/stereo_depth_map.png}
+        \caption{Computed depth map}
+    \end{subfigure}
+    \caption{Stereo vision proof-of-concept}
+    \label{fig:stereo_poc}
+\end{figure}
+
+However, consultation with Beko engineers revealed that stereo's advantages didn't justify its mechanical complexity and calibration requirements. Since partial insertion detection wasn't required and stereo correspondence noise could degrade accuracy with limited training data, we opted for a simpler two-camera setup optimized for comprehensive coverage.
+
+\subsubsection{Final Camera Configuration}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/camera_config_top.png}
+        \caption{Top view (10° tilt)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/camera_config_lateral.png}
+        \caption{Rear camera (25-35° azimuth)}
+    \end{subfigure}
+    \caption{Final optimized camera placement}
+    \label{fig:camera_final}
+\end{figure}
+
+\textbf{Top Camera:} Positioned vertically with 10° forward tilt to reduce reflections, clear the raised front panel (8-10 cm height difference), and provide slight depth perspective for cable routing assessment.
+
+\textbf{Rear Camera:} Horizontal mounting with 25-35° azimuthal rotation, critical for observing rear panel connectors that would be invisible from perpendicular angles.
+
+Both cameras use fixed manual settings (ISO, exposure, white balance) ensuring temporal consistency.
+
+\subsection{Image Preprocessing Pipeline}
+
+\subsubsection{Alignment and Normalization}
+
+Raw images undergo feature-based homography estimation using ORB features, RANSAC outlier rejection, and ECC fallback for difficult cases. This ensures connectors appear at consistent pixel locations across all images.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/raw_image_1.png}
+        \caption{Before: varying positions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figures/aligned_image_1.png}
+        \caption{After: consistent alignment}
+    \end{subfigure}
+    \caption{Image alignment preprocessing}
+    \label{fig:alignment}
+\end{figure}
+
+Two-stage illumination normalization applies CLAHE (Contrast Limited Adaptive Histogram Equalization) in LAB color space followed by gray-world white balance. This reduced morning-to-afternoon intensity variation by 68\%, from 1.73 to 0.54 grayscale units.
+
+\subsubsection{Connector Extraction}
+
+Nine connector ROIs are extracted using relative coordinates, enabling resolution independence. Each crop undergoes local CLAHE enhancement and resizes to 128×128 pixels for model input.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/roi_visualization.png}
+    \caption{Nine connector regions (CONN1-CONN9) extracted for analysis}
+    \label{fig:rois}
+\end{figure}
+
+\section{Evolution of Detection Approaches: Key Learnings}
+
+Our path to the final solution involved exploring multiple paradigms. While the following sections describe earlier approaches, they represent essential learning that informed our final architecture.
+
+\subsection{Phase 1: PatchCore Exploration}
+
+We initially explored PatchCore, a memory-based anomaly detector building a bank of patch-level features from normal samples. While it successfully detected all 27 KO cases with only 8 false positives, PatchCore presented critical limitations:
+
+\begin{itemize}
+    \item \textbf{Memory footprint:} 50,000 high-dimensional descriptors per connector type
+    \item \textbf{Slow inference:} Multiple seconds per board due to nearest-neighbor searches
+    \item \textbf{No KO/OCCLUSION separation:} Both appeared anomalous relative to OK samples
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/pca_scatter.png}
+    \caption{PCA visualization showing OK manifold with KO samples displaced and OCCLUSION overlapping}
+    \label{fig:pca}
+\end{figure}
+
+\textbf{The key insight}\textbf{:} PatchCore validated that CNN features capture meaningful patterns, but we needed a more efficient and discriminative approach.
+
+\subsection{Phase 2: EfficientAD Investigation}
+
+EfficientAD's teacher-student framework offered significant efficiency improvements. A frozen pretrained ResNet18 teacher provides rich features, while a trainable student learns to reproduce teacher outputs on OK samples only. At test time, teacher-student disagreement indicates anomalies.
+
+Results were mixed: connectors 1, 5, 7, and 8 achieved 100\% recall with minimal false positives, but connector 6 managed only 25\% recall (missing 3/4 defects) and connector 9 showed high false positive rates.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/confusion_matrices.png}
+    \caption{EfficientAD per-connector performance variability}
+    \label{fig:efficientad_conf}
+\end{figure}
+
+The critical learning: relying solely on anomaly detection for the three-class problem (OK/KO/OCCLUSION) is inherently difficult because both KO and OCCLUSION appear anomalous for different reasons.
+
+\section{Final System: Multi-Stage Probability-Based Pipeline}
+
+This section describes our production-ready system, representing the culmination of insights from earlier phases.
+
+\subsection{Architectural Philosophy}
+
+The fundamental insight driving our final design was to solve separately the occlusion problem and defect detection problem as conceptually distinct.
+
+\begin{itemize}
+    \item \textbf{Occlusion detection:} A visual recognition task ("Is there a cable blocking this connector?") where CNNs excel given sufficient examples (we have 485 occlusion samples)
+    \item \textbf{Defect detection:} A normality assessment task ("Does this visible connector appear properly connected?") suited to anomaly detection (we have only 25 KO samples)
+\end{itemize}
+
+This architectural decomposition transforms an intractable three-class imbalanced problem into two tractable binary problems, each addressed with the appropriate technique.
+
+\subsection{Stage 1: Occlusion Classification}
+
+\subsubsection{Model Architecture}
+
+We designed a custom, lightweight Convolutional Neural Network (CNN) specifically for binary classification (OCCLUSION vs. VISIBLE). The architecture prioritizes inference speed while maintaining sufficient capacity to recognize cable textures and shapes.
+
+The network accepts a $128 \times 128$ RGB input and processes it through three convolutional blocks. Each block performs spatial downsampling via max pooling, progressively increasing the channel depth from 3 to 128. The feature extraction phase is followed by a dense classification head with dropout regularization to prevent overfitting.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{llcc}
+\toprule
+\textbf{Layer} & \textbf{Operations} & \textbf{Parameters} & \textbf{Output Shape} \\
+\midrule
+\textbf{Input} & - & - & $128 \times 128 \times 3$ \\
+\midrule
+\textbf{Block 1} & Conv2d ($3 \to 32$) & $3 \times 3$, pad=1 & $128 \times 128 \times 32$ \\
+& BatchNorm + ReLU & - & - \\
+& MaxPool2d & $2 \times 2$ & $64 \times 64 \times 32$ \\
+\midrule
+\textbf{Block 2} & Conv2d ($32 \to 64$) & $3 \times 3$, pad=1 & $64 \times 64 \times 64$ \\
+& BatchNorm + ReLU & - & - \\
+& MaxPool2d & $2 \times 2$ & $32 \times 32 \times 64$ \\
+\midrule
+\textbf{Block 3} & Conv2d ($64 \to 128$) & $3 \times 3$, pad=1 & $32 \times 32 \times 128$ \\
+& BatchNorm + ReLU & - & - \\
+& MaxPool2d & $2 \times 2$ & $16 \times 16 \times 128$ \\
+\midrule
+\textbf{Classifier} & Flatten & - & 32,768 \\
+& Linear + ReLU & $32768 \to 512$ & 512 \\
+& Dropout & $p=0.5$ & 512 \\
+& Linear (Logits) & $512 \to 2$ & 2 \\
+\bottomrule
+\end{tabular}
+\caption{Architecture of the Stage 1 Occlusion Classifier}
+\label{tab:cnn_arch}
+\end{table}
+\subsubsection{Training Details}
+
+\begin{itemize}
+    \item \textbf{Dataset:} 2,853 connector images (PARTIAL\_OCCLUSION merged into OCCLUSION)
+    \item \textbf{Split:} 80\% training, 20\% validation
+    \item \textbf{Loss:} CrossEntropyLoss
+    \item \textbf{Optimizer:} Adam (lr=0.001)
+    \item \textbf{Epochs:} 20 (early convergence)
+    \item \textbf{Batch size:} 32
+\end{itemize}
+
+The model achieved high accuracy distinguishing occluded from visible connectors. When OCCLUSION is predicted, the pipeline immediately returns "OCCLUSION" without invoking anomaly detection, saving computation and avoiding false defect flags.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/labeler_interface.png}
+    \caption{Interactive labeling interface used for dataset annotation}
+    \label{fig:labeler}
+\end{figure}
+
+\subsection{Stage 2: Probability-Based Anomaly Detection}
+
+\subsubsection{Architecture and Training}
+
+For connectors classified as VISIBLE, we apply per-connector anomaly detection models. Each of the nine connector types has a dedicated model trained exclusively on its OK visible samples.
+
+The architecture follows a teacher-student paradigm:
+\begin{itemize}
+    \item \textbf{Teacher:} Frozen pretrained ResNet18 (ImageNet weights)
+    \item \textbf{Student:} Randomly initialized ResNet18 trained to mimic teacher
+    \item \textbf{Training objective:} Minimize MSE between teacher and student feature maps on OK samples
+    \item \textbf{Anomaly signal:} At test time, large teacher-student disagreement indicates anomaly
+\end{itemize}
+
+\subsubsection{Probability Scoring Mechanism}
+
+The critical innovation in our final system is the probability-based scoring rather than simple threshold-based binary classification. For each test image, we compute:
+
+\begin{equation}
+\text{prob\_ko} = f(\|\mathbf{F}_{\text{teacher}} - \mathbf{F}_{\text{student}}\|^2)
+\end{equation}
+
+where $f$ is a calibrated mapping from feature disagreement to probability space [0, 1].
+
+The classification decision becomes:
+\begin{equation}
+\text{prediction} = 
+\begin{cases}
+\text{KO} & \text{if } \text{prob\_ko} \geq \tau \\
+\text{OK} & \text{otherwise}
+\end{cases}
+\end{equation}
+
+where $\tau$ is a per-connector threshold optimized during validation.
+
+\subsubsection{Threshold Optimization}
+
+Rather than using arbitrary thresholds, we employ a data-driven optimization strategy:
+
+\begin{enumerate}
+    \item Compute prob\_ko for all training OK samples
+    \item Compute prob\_ko for all available KO samples (if any)
+    \item Set threshold to maximize F1-score on validation set
+    \item Apply safety margin (95\% of minimum KO score) to prioritize recall
+\end{enumerate}
+
+This conservative strategy reflects industrial reality: false negatives (missed defects) are far more costly than false positives (unnecessary human verification).
+
+\subsubsection{Score Distribution and Gap Analysis}
+
+To validate the reliability of our anomaly detection, we implemented a rigorous statistical analysis of the probability scores ($P_{KO}$) generated by the student-teacher network. For every connector type, we visualize the distribution of scores for predicted "OK" samples versus predicted "KO" samples.
+
+The analysis pipeline, implemented in our evaluation script, performs the following steps:
+\begin{enumerate}
+    \item \textbf{Inference:} Compute the anomaly probability score ($P_{KO}$) for the entire validation dataset.
+    \item \textbf{Distribution Plotting:} Generate dual histograms to visualize the density of scores for normal and defective samples relative to the decision threshold ($\tau$).
+    \item \textbf{Gap Calculation:} To quantify the robustness of the decision boundary, we compute the "Separation Gap" metric:
+    \begin{equation}
+        \text{Gap} = \min(P_{KO}^{\text{defects}}) - \max(P_{KO}^{\text{normal}})
+    \end{equation}
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    % Placeholder for the plot generated by your code
+    \includegraphics[width=0.9\textwidth]{figures/score_distributions.png} 
+    \caption{Score distribution histograms generated by the evaluation pipeline. The vertical blue line represents the optimized threshold $\tau$. A positive gap (right) indicates robust separation, while overlap (left) indicates ambiguity.}
+    \label{fig:score_dist}
+\end{figure}
+
+\textbf{Interpretation of Results:}
+As shown in Figure \ref{fig:score_dist}, a positive gap ($\text{Gap} > 0$) confirms that the model has found a perfect decision boundary with a clear safety margin between the most anomalous "good" connector and the least obvious "bad" connector. 
+Conversely, a negative gap or overlapping histograms signals potential ambiguity, prompting us to adjust the safety margin or flag those specific cases for human review. This quantitative approach allows us to set thresholds dynamically based on the statistical confidence of the model rather than arbitrary tuning.
+\subsubsection{Per-Connector Model Specialization}
+
+Each connector type has distinct geometry, typical appearance, and failure modes. Per-connector specialization allows:
+
+\begin{itemize}
+    \item \textbf{Customized thresholds:} Conn1 might use $\tau = 0.45$ while conn6 uses $\tau = 0.32$
+    \item \textbf{Adapted student networks:} Each student learns the specific normality pattern of its connector
+    \item \textbf{Independent optimization:} Poor performance on conn6 doesn't compromise conn1
+\end{itemize}
+
+\subsection{Inference Pipeline}
+
+The complete inference workflow for a full PCB image:
+
+\begin{lstlisting}[language=Python, caption=Inference pipeline pseudocode]
+def classify_pcb_board(image_path):
+    # Preprocessing
+    aligned_img = align_and_normalize(image_path)
+    connectors = extract_nine_rois(aligned_img)
+    
+    results = []
+    for i, conn_crop in enumerate(connectors):
+        conn_id = f"conn{i+1}"
+        
+        # Stage 1: Occlusion detection
+        is_occluded = occlusion_classifier(conn_crop)
+        if is_occluded:
+            results.append({
+                'connector': conn_id,
+                'prediction': 'OCCLUSION',
+                'prob_ko': None
+            })
+            continue
+        
+        # Stage 2: Anomaly detection
+        model, threshold = load_model(conn_id)
+        prob_ko = compute_anomaly_score(conn_crop, model)
+        
+        prediction = 'KO' if prob_ko >= threshold else 'OK'
+        results.append({
+            'connector': conn_id,
+            'prediction': prediction,
+            'prob_ko': prob_ko,
+            'threshold': threshold
+        })
+    
+    return results
+\end{lstlisting}
+
+\subsection{Heatmap Generation for Explainability}
+
+For engineering diagnostics and operator trust, the system generates visual anomaly heatmaps:
+
+\begin{enumerate}
+    \item Compute squared difference: $\mathbf{D} = (\mathbf{F}_{\text{teacher}} - \mathbf{F}_{\text{student}})^2$
+    \item Upsample to original resolution via bilinear interpolation
+    \item Normalize and apply yellow-to-red colormap
+    \item Overlay on original image with transparency
+    \item Draw contours around highly anomalous regions
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/efficientad_localization.png}
+    \caption{Anomaly localization heatmaps showing model attention on defective regions}
+    \label{fig:heatmaps}
+\end{figure}
+
+These heatmaps serve multiple purposes:
+\begin{itemize}
+    \item \textbf{Operator feedback:} Visual confirmation of why a connector was flagged
+    \item \textbf{Engineering diagnostics:} Identifying systematic issues (e.g., shadowing problems)
+    \item \textbf{Model validation:} Verifying the model focuses on relevant regions (connector cavity) rather than spurious patterns
+\end{itemize}
+
+\subsection{Graphical User Interface}
+
+The final system integrates into a production-ready desktop application built with Python and Tkinter.
+
+\begin{figure}[H]
+    \centering
+    % Left Image
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/gui_all_ok.png}
+        \caption{Board with all connectors OK (Green)}
+        \label{fig:gui_ok}
+    \end{subfigure}
+    \hfill % Adds flexible space between images
+    % Right Image
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/gui_ko_detections.png}
+        \caption{KO detections (Red) with heatmaps}
+        \label{fig:gui_ko}
+    \end{subfigure}
+    
+    \caption{The Graphical User Interface showing successful (a) and defective (b) inspection results.}
+    \label{fig:gui_combined}
+\end{figure}
+\textbf{Key Features:}
+\begin{itemize}
+    \item \textbf{Drag-and-drop:} Simple image loading for operators
+    \item \textbf{Automatic processing:} Background thread execution maintains UI responsiveness
+    \item \textbf{3×3 grid visualization:} All nine connectors displayed with color-coded status
+    \item \textbf{Probability display:} Each connector shows its prob\_ko score and threshold
+    \item \textbf{Heatmap overlay:} Visual explanation of classification decision
+    \item \textbf{Statistics panel:} Summary counts and per-connector details
+    \item \textbf{Professional branding:} Polimi and BEKO logos
+\end{itemize}
+
+The application distributes as a standalone executable requiring no Python installation or technical configuration.
+
+\section{Results and Performance Analysis}
+
+\subsection{Overall System Performance}
+
+Our final multi-stage system achieved strong performance on the complete dataset:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{Value} & \textbf{Notes} \\
+\midrule
+Total images & 2,853 & 9 connectors × 317 boards \\
+Correct predictions & 2,714 & Across all classes \\
+Overall accuracy & \textbf{95.13\%} & Production-grade performance \\
+\bottomrule
+\end{tabular}
+\caption{Overall system performance}
+\label{tab:overall}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Class} & \textbf{Correct} & \textbf{Total} & \textbf{Accuracy} \\
+\midrule
+OK & 2300 & 2343 & 98.16\% \\
+KO & 21 & 25 & 84.00\% \\
+OCCLUSION & 393 & 485 & 81.03\% \\
+\bottomrule
+\end{tabular}
+\caption{Per-class accuracy}
+\label{tab:class_acc}
+\end{table}
+
+The system achieves very high accuracy on OK samples (the most common case) while maintaining reasonable performance on minority classes despite extreme scarcity.
+
+\subsection{Per-Connector Analysis}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lccl}
+\toprule
+\textbf{Connector} & \textbf{Accuracy} & \textbf{Correct/Total} & \textbf{Key Characteristics} \\
+\midrule
+conn1 & 97.16\% & 308/317 & Good separation, 5 KO samples \\
+conn2 & 98.11\% & 311/317 & Excellent performance \\
+conn3 & \textbf{100.00\%} & 317/317 & Perfect visibility, no occlusions \\
+conn4 & 94.01\% & 298/317 & High occlusion rate (39\%) \\
+conn5 & 96.85\% & 307/317 & Variable occlusions, 4 KO \\
+conn6 & 88.01\% & 279/317 & Challenging: subtle KO cases \\
+conn7 & 89.59\% & 284/317 & Partial occlusion issues \\
+conn8 & 98.11\% & 311/317 & Clear visual patterns \\
+conn9 & 94.32\% & 299/317 & Stable performance \\
+\bottomrule
+\end{tabular}
+\caption{Per-connector performance breakdown}
+\label{tab:per_connector}
+\end{table}
+
+Performance variance reflects inherent connector characteristics:
+\begin{itemize}
+    \item \textbf{conn3:} Benefits from perfect visibility and simple geometry
+    \item \textbf{conn6, conn7:} Challenging due to subtle visual differences and occlusion ambiguity
+    \item \textbf{conn4:} High occlusion rate (39\%) handled well by Stage 1 classifier
+\end{itemize}
+
+\subsection{Probability Score Analysis}
+
+The probability-based approach enables fine-grained analysis beyond binary classification:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/score_distributions.png}
+    \caption{Probability distributions for all connectors showing separation quality}
+    \label{fig:all_scores}
+\end{figure}
+
+\textbf{Separation Metrics:}
+\begin{itemize}
+    \item \textbf{conn1:} Gap = +0.15 (excellent separation)
+    \item \textbf{conn5:} Gap = +0.12 (good separation)
+    \item \textbf{conn6:} Gap = -0.03 (slight overlap, explains lower accuracy)
+    \item \textbf{conn9:} Gap = +0.08 (moderate separation)
+\end{itemize}
+
+Connectors with positive gaps show clean separation between OK and KO distributions, validating the anomaly detection approach. Negative gaps indicate inherent difficulty requiring additional training data or architectural refinement.
+
+\subsection{Error Analysis}
+
+\textbf{Main Error Types:}
+
+\begin{enumerate}
+    \item \textbf{OK predicted as KO (39 cases, 1.7\% of OK):}
+    \begin{itemize}
+        \item Cause: Unusual shadows, reflections, or normal variance exceeding learned distribution
+        \item Impact: Conservative errors triggering human verification
+        \item Mitigation: Acceptable in production (false positives cheaper than false negatives)
+    \end{itemize}
+    
+    \item \textbf{KO predicted as OK (3 cases, 12\% of KO):}
+    \begin{itemize}
+        \item Cause: Extremely subtle visual differences, cable barely visible even to humans
+        \item Impact: Missed defects (most critical error type)
+        \item Mitigation: Consider additional camera angles or multi-view fusion
+    \end{itemize}
+    
+    \item \textbf{OCCLUSION predicted as KO (56 cases, 11.5\% of OCCLUSION):}
+    \begin{itemize}
+        \item Cause: Partial occlusions misclassified as VISIBLE by Stage 1, appearing anomalous to Stage 2
+        \item Impact: Conservative errors (human verification triggered)
+        \item Mitigation: Collect more partial occlusion examples for Stage 1 training
+    \end{itemize}
+    
+    \item \textbf{OCCLUSION predicted as OK (36 cases, 7.4\% of OCCLUSION):}
+    \begin{itemize}
+        \item Cause: Light occlusions where connector remains largely visible
+        \item Impact: Potentially acceptable (connector state verifiable despite occlusion)
+        \item Note: Some labeling subjectivity (borderline cases could arguably be OK)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Computational Performance}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{CPU} & \textbf{GPU} \\
+\midrule
+Preprocessing (alignment + norm) & 0.8-1.2s & 0.8-1.2s \\
+Occlusion classification (9 connectors) & 0.3-0.5s & 0.1-0.2s \\
+Anomaly detection (avg 6-7 visible) & 0.9-1.3s & 0.2-0.4s \\
+Heatmap generation & 0.2-0.3s & 0.1-0.2s \\
+\midrule
+\textbf{Total per board} & \textbf{2-3s} & \textbf{0.5-1s} \\
+\bottomrule
+\end{tabular}
+\caption{Inference time breakdown}
+\label{tab:timing}
+\end{table}
+
+\textbf{Model Sizes:}
+\begin{itemize}
+    \item Occlusion CNN: 64 MB
+    \item 9× Student networks: 43 MB each = 387 MB
+    \item Total: ~451 MB
+\end{itemize}
+
+The system runs comfortably in real-time on standard industrial PCs, even without GPU acceleration—critical for cost-effective deployment.
+
+\section{Discussion and Lessons Learned}
+
+\subsection{Why the Multi-Stage Approach Succeeds}
+
+The success of our final architecture stems from matching problem structure to algorithmic strengths:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Sub-problem} & \textbf{Characteristics} & \textbf{Optimal Approach} \\
+\midrule
+Occlusion detection & Visual recognition & Supervised CNN \\
+ & 485 positive examples & (sufficient data) \\
+ & Clear visual patterns & \\
+\midrule
+Defect detection & Normality assessment & Anomaly detection \\
+ & 25 positive examples & (data-scarce) \\
+ & Subtle differences & \\
+\bottomrule
+\end{tabular}
+\caption{Problem decomposition rationale}
+\label{tab:decomposition}
+\end{table}
+
+Attempting to solve the three-class problem with a single model forces the model to learn multiple orthogonal concepts simultaneously with highly imbalanced data. Decomposition allows each stage to specialize and leverage the appropriate learning paradigm.
+
+\subsection{The Value of Probability Scoring}
+
+Moving from binary thresholds to continuous probability scores offers several operational advantages. First, it enables \textbf{confidence quantification}; a score of 0.95 is distinct from a marginal 0.51, even if both technically exceed the threshold. Second, this allows for \textbf{prioritized human review}, where high-uncertainty cases near the decision boundary can be flagged for immediate inspection. Third, the analysis of \textbf{score distributions} provides diagnostic insights into model separation quality. Finally, the system supports \textbf{adaptive thresholding}, allowing production managers to adjust sensitivity between conservative and permissive modes without the need to retrain models.
+
+\subsection{Domain Knowledge Integration}
+
+Several critical architectural decisions were directly informed by the manufacturing context. We defined the \textbf{scope} to focus on presence/absence rather than partial insertion based on failure mode analysis. We adopted a strategy of \textbf{conservative thresholding} with a 95\% safety margin, reflecting the economic asymmetry where false negatives (missed defects) are far more costly than false positives. The understanding that cable overlaps are frequent but benign led to treating \textbf{occlusion as a non-defect} in our pipeline design. Lastly, the recognition of unique component geometries necessitated \textbf{per-connector models} rather than a generic approach.
+
+\subsection{Limitations and Future Directions}
+
+While the current system performs well within the defined scope, three specific technical evolutions would significantly enhance its robustness in a live production environment:
+
+\textbf{1. Multi-View Fusion to Eliminate Occlusions:}
+The primary cause of uncertainty in our current system is visual occlusion (17\% of the dataset). Software filtering alone cannot recover information that is physically blocked. Future hardware iterations should implement a multi-view fusion strategy using 3-4 synchronized cameras. By geometrically correlating these views, the system could ensure that every connector is visible in at least one angle, effectively eliminating the "Occlusion" class rather than merely managing it.
+
+\textbf{2. Closed-Loop Model Maintenance:}
+Currently, model updates require manual engineering intervention. To ensure long-term stability, a human-in-the-loop feedback mechanism should be integrated into the GUI. When an operator overrides a model prediction (e.g., flagging a False Positive as OK), that image should be automatically tagged and added to a "fine-tuning" dataset. This allows the system to autonomously adapt to subtle production drifts—such as batch variations in cable colors or lighting changes—without requiring a data scientist.
+
+\textbf{3. Geometric Cable Tracing:}
+Our current approach relies on texture-based anomaly detection. A more deterministic approach for the most difficult cases would be semantic segmentation of cable paths. By explicitly training a model to trace the geometric vector of the wire harness, the system could mathematically verify if a cable "terminates" inside the connector coordinates, providing a geometric check to corroborate the visual anomaly score.
+
+\subsection{Development Process Insights}
+
+\textbf{Iteration is Essential:} Our path stereo vision → PatchCore → EfficientAD → multi-stage demonstrates that empirical iteration often outperforms upfront design. Each failed approach taught critical lessons.
+
+\noindent \textbf{Simplicity Has Value:} Final architecture combines simple components (lightweight CNN + teacher-student anomaly detection) rather than complex end-to-end models. This simplifies debugging, maintenance, and operator trust.
+
+\noindent \textbf{The 80/20 Rule:} Reaching 80\% accuracy was straightforward; achieving 95\%+ required disproportionate effort in threshold tuning, per-connector optimization, and edge case handling.
+
+\noindent \textbf{User Interface Matters:} Sophisticated algorithms fail in practice if difficult to use. GUI investment was as critical as model accuracy for production acceptance.
+
+\section{Conclusions}
+
+This project demonstrates the efficacy of deep learning for industrial quality control under extreme data scarcity. Our multi-stage system achieves \textbf{95.13\% overall accuracy} across nine connector types, effectively utilizing just 25 defect samples to catch 84\% of genuine failures. The key driver of this success was the \textbf{architectural decomposition} of the problem—separating occlusion filtering from anomaly detection—which allowed robust performance despite variable production conditions.
+
+Developed in close collaboration with Beko Europe, the final deployable software represents a practical synthesis of academic rigor and industrial necessity. It offers a consistent, tireless monitoring tool that complements human inspection, demonstrating that modern AI can be effectively operationalized on the factory floor.
+
+\section{Acknowledgments}
+
+We sincerely thank \textbf{Prof. Fredy Ruiz} for his guidance on balancing technical rigor with deployability. We are deeply grateful to \textbf{Marco Cederle} and \textbf{Davide Cazzaniga} from Beko Europe for their domain expertise and for facilitating our factory visits. Special thanks to the production operators for their practical feedback on our interface, and to our team members for their dedicated collaboration across diverse technical disciplines.
+\section*{References}
+
+\begin{enumerate}[label={[\arabic*]}, leftmargin=*]
+    \item K. Batzner, L. Heckler, and R. König, "EfficientAD: Accurate Visual Anomaly Detection at Millisecond-Level Latencies," \textit{arXiv preprint arXiv:2303.14535}, 2023.
+    
+    \item E. Rublee, V. Rabaud, K. Konolige, and G. Bradski, "ORB: An efficient alternative to SIFT or SURF," \textit{International Conference on Computer Vision (ICCV)}, 2011.
+    
+    \item K. Roth, L. Pemula, J. Zepeda, B. Schölkopf, T. Brox, and P. Gehler, "Towards Total Recall in Industrial Anomaly Detection," \textit{IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, 2022.
+    
+    \item K. He, X. Zhang, S. Ren, and J. Sun, "Deep Residual Learning for Image Recognition," \textit{IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 2016.
+    
+    \item S. M. Pizer et al., "Adaptive histogram equalization and its variations," \textit{Computer Vision, Graphics, and Image Processing}, vol. 39, no. 3, pp. 355–368, 1987.
+    
+    \item D. G. Lowe, "Distinctive Image Features from Scale-Invariant Keypoints," \textit{International Journal of Computer Vision}, vol. 60, no. 2, pp. 91–110, 2004.
+\end{enumerate}
+
+\end{document}
