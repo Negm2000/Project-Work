@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.1.18)  14 FEB 2026 19:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2026.1.18)  14 FEB 2026 19:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -827,11 +827,11 @@ File: figures/raw_image_1.png Graphic file (type png)
 <use figures/raw_image_1.png>
 Package pdftex.def Info: figures/raw_image_1.png  used on input line 180.
 (pdftex.def)             Requested size: 217.42265pt x 135.87717pt.
-<figures/aligned_image_1.png, id=221, 1586.92876pt x 656.4525pt>
+<figures/aligned_image_1.png, id=221, 1616.0375pt x 682.55pt>
 File: figures/aligned_image_1.png Graphic file (type png)
 <use figures/aligned_image_1.png>
 Package pdftex.def Info: figures/aligned_image_1.png  used on input line 185.
-(pdftex.def)             Requested size: 217.42265pt x 89.93945pt.
+(pdftex.def)             Requested size: 217.42265pt x 91.82782pt.
 
 
 [3 <./figures/raw_image_1.png (PNG copy)> <./figures/aligned_image_1.png (PNG copy)>]
@@ -925,23 +925,30 @@ Package pdftex.def Info: figures/feature_maps.png  used on input line 418.
 
 
 [11 <./figures/feature_maps.png>]
-Overfull \hbox (5.4711pt too wide) in paragraph at lines 460--460
- []\OT1/cmtt/m/n/6 figures/patchcore_heatmap.png 
- []
+<figures/pca_scatter.png, id=302, 722.7pt x 505.89pt>
+File: figures/pca_scatter.png Graphic file (type png)
+<use figures/pca_scatter.png>
+Package pdftex.def Info: figures/pca_scatter.png  used on input line 455.
+(pdftex.def)             Requested size: 217.42265pt x 152.19272pt.
+<figures/patchcore_heatmap.png, id=303, 1091.57813pt x 743.02594pt>
+File: figures/patchcore_heatmap.png Graphic file (type png)
+<use figures/patchcore_heatmap.png>
+Package pdftex.def Info: figures/patchcore_heatmap.png  used on input line 460.
+(pdftex.def)             Requested size: 217.42265pt x 147.99031pt.
 
 
 LaTeX Warning: Citation 'roth2022patchcore' on page 12 undefined on input line 468.
 
 
 
-[12]
+[12 <./figures/pca_scatter.png> <./figures/patchcore_heatmap.png>]
 
 LaTeX Warning: Citation 'batzner2023efficientad' on page 13 undefined on input line 481.
 
 
 LaTeX Warning: Citation 'batzner2023efficientad' on page 13 undefined on input line 481.
 
-<figures/confusion_matrices.png, id=311, 1084.05pt x 1084.05pt>
+<figures/confusion_matrices.png, id=312, 1084.05pt x 1084.05pt>
 File: figures/confusion_matrices.png Graphic file (type png)
 <use figures/confusion_matrices.png>
 Package pdftex.def Info: figures/confusion_matrices.png  used on input line 513.
@@ -953,23 +960,24 @@ Package pdftex.def Info: figures/confusion_matrices.png  used on input line 513.
 [14 <./figures/confusion_matrices.png>]
 
 [15]
-Overfull \hbox (21.70833pt too wide) in paragraph at lines 574--574
- []\OT1/cmtt/m/n/6 figures/Soft_summary.jpeg 
- []
+<figures/Soft_summary.jpeg, id=338, 1606.0pt x 680.5425pt>
+File: figures/Soft_summary.jpeg Graphic file (type jpg)
+<use figures/Soft_summary.jpeg>
+Package pdftex.def Info: figures/Soft_summary.jpeg  used on input line 574.
+(pdftex.def)             Requested size: 144.95303pt x 61.42271pt.
+<figures/Soft_KO.jpeg, id=339, 1567.8575pt x 1569.865pt>
+File: figures/Soft_KO.jpeg Graphic file (type jpg)
+<use figures/Soft_KO.jpeg>
+Package pdftex.def Info: figures/Soft_KO.jpeg  used on input line 579.
+(pdftex.def)             Requested size: 144.95303pt x 145.13837pt.
+<figures/Soft_OK.jpeg, id=340, 1397.22pt x 1559.8275pt>
+File: figures/Soft_OK.jpeg Graphic file (type jpg)
+<use figures/Soft_OK.jpeg>
+Package pdftex.def Info: figures/Soft_OK.jpeg  used on input line 584.
+(pdftex.def)             Requested size: 129.0975pt x 144.11517pt.
 
 
-Overfull \hbox (5.7706pt too wide) in paragraph at lines 579--579
- []\OT1/cmtt/m/n/6 figures/Soft_KO.jpeg 
- []
-
-
-Overfull \hbox (12.11272pt too wide) in paragraph at lines 584--584
- []\OT1/cmtt/m/n/6 figures/Soft_OK.jpeg 
- []
-
-
-
-[16]
+[16 <./figures/Soft_summary.jpeg> <./figures/Soft_KO.jpeg> <./figures/Soft_OK.jpeg>]
 
 [17]
 
@@ -997,17 +1005,17 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 23904 strings out of 468080
- 417139 string characters out of 5423316
+ 23922 strings out of 468080
+ 417831 string characters out of 5423316
  1344912 words of memory out of 5000000
- 52193 multiletter control sequences out of 15000+600000
- 639669 words of font info for 85 fonts, out of 8000000 for 9000
+ 52214 multiletter control sequences out of 15000+600000
+ 638896 words of font info for 82 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,12n,79p,985b,827s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <C:\Users\Karim Negm\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (19 pages, 9424951 bytes).
+ <C:\Users\Karim Negm\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.pk><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on main.pdf (19 pages, 11052287 bytes).
 PDF statistics:
- 451 PDF objects out of 1000 (max. 8388607)
+ 448 PDF objects out of 1000 (max. 8388607)
  92 named destinations out of 1000 (max. 500000)
- 363 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 388 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -344,15 +344,42 @@ INPUT .\figures\feature_maps.png
 INPUT .\figures\feature_maps.png
 INPUT .\figures\feature_maps.png
 INPUT .\figures\feature_maps.png
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss10.tfm
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss8.tfm
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt8.tfm
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\pca_scatter.png
+INPUT .\figures\patchcore_heatmap.png
+INPUT .\figures\patchcore_heatmap.png
+INPUT .\figures\patchcore_heatmap.png
+INPUT .\figures\patchcore_heatmap.png
+INPUT .\figures\patchcore_heatmap.png
+INPUT .\figures\patchcore_heatmap.png
 INPUT .\figures\confusion_matrices.png
 INPUT .\figures\confusion_matrices.png
 INPUT .\figures\confusion_matrices.png
 INPUT .\figures\confusion_matrices.png
 INPUT .\figures\confusion_matrices.png
 INPUT .\figures\confusion_matrices.png
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_summary.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_KO.jpeg
+INPUT .\figures\Soft_OK.jpeg
+INPUT .\figures\Soft_OK.jpeg
+INPUT .\figures\Soft_OK.jpeg
+INPUT .\figures\Soft_OK.jpeg
+INPUT .\figures\Soft_OK.jpeg
+INPUT .\figures\Soft_OK.jpeg
 INPUT main.aux
 INPUT .\main.out
 INPUT .\main.out
@@ -382,8 +409,6 @@ INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfo
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr6.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr8.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr8.pfb
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss10.pfb
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy8.pfb
@@ -392,7 +417,5 @@ INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfo
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb
-INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt8.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\symbols\msbm10.pfb
 INPUT C:\Users\Karim Negm\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\symbols\msbm10.pfb
