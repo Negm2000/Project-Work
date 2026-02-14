@@ -1,0 +1,5 @@
+{
+  "threshold": 0.0016605422249995172,
+  "percentile": 99.5,
+  "val_ok_fpr_estimate": 0.0
+}

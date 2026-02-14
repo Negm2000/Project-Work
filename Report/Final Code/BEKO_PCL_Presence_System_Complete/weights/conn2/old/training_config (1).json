@@ -1,0 +1,15 @@
+{
+  "connector_id": "conn2",
+  "image_size": [
+    299,
+    118
+  ],
+  "inpaint_radius": 3,
+  "mask_dilate_px": 3,
+  "threshold": 0.0003771192173007874,
+  "val_ok_fpr_estimate": 3.125,
+  "final_train_loss": 0.00014311222104071121,
+  "final_val_loss": 6.44894244032912e-05,
+  "final_val_auc": 1.0,
+  "num_epochs_trained": 15
+}

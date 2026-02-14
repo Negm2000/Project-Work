@@ -2,71 +2,95 @@
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\abx@aux@refcontext{none/global//global/global/global}
+\abx@aux@cite{0}{anand2020guide}
+\abx@aux@segm{0}{0}{anand2020guide}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Executive Summary}{2}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Introduction and Problem Statement}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Industrial Context}{2}{subsection.2.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Technical Challenges}{2}{subsection.2.2}\protected@file@percent }
+\abx@aux@cite{0}{pizer1987clahe}
+\abx@aux@segm{0}{0}{pizer1987clahe}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Project Objectives}{3}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}System Design and Hardware}{3}{section.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Camera Configuration}{3}{subsection.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Stereo vision proof-of-concept}}{3}{figure.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Preprocessing Pipeline}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Image alignment preprocessing}}{3}{figure.caption.1}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:stereo_poc}{{1}{3}{Stereo vision proof-of-concept}{figure.caption.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Final optimized camera placement}}{4}{figure.caption.2}\protected@file@percent }
-\newlabel{fig:camera_final}{{2}{4}{Final optimized camera placement}{figure.caption.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Preprocessing Pipeline}{4}{subsection.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Image alignment preprocessing}}{5}{figure.caption.3}\protected@file@percent }
-\newlabel{fig:alignment}{{3}{5}{Image alignment preprocessing}{figure.caption.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Nine connector regions (CONN1--CONN9) extracted for analysis}}{6}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:rois}{{4}{6}{Nine connector regions (CONN1--CONN9) extracted for analysis}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Solution: Synthetic Negative Detection}{6}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Problem Reframing and Rationale}{6}{subsection.4.1}\protected@file@percent }
-\citation{telea2004inpainting}
-\citation{he2016resnet}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Mask-Driven Synthetic KO Generation}{7}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Dataset Construction and Augmentation}{7}{subsection.4.3}\protected@file@percent }
+\newlabel{fig:alignment}{{1}{3}{Image alignment preprocessing}{figure.caption.1}{}}
+\abx@aux@cite{0}{telea2004inpainting}
+\abx@aux@segm{0}{0}{telea2004inpainting}
+\abx@aux@cite{0}{batzner2023efficientad}
+\abx@aux@segm{0}{0}{batzner2023efficientad}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Nine connector regions (CONN1--CONN9) extracted for analysis}}{4}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:rois}{{2}{4}{Nine connector regions (CONN1--CONN9) extracted for analysis}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Final Pipeline: Synthetic Negative Detection}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Problem Reframing and Motivation}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Mask-Driven Synthetic KO Generation}{4}{subsection.4.2}\protected@file@percent }
+\abx@aux@cite{0}{telea2004inpainting}
+\abx@aux@segm{0}{0}{telea2004inpainting}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Polygon masks for PCL regions across all connectors, ensuring the model focuses only on relevant seating areas.}}{5}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:masks}{{3}{5}{Polygon masks for PCL regions across all connectors, ensuring the model focuses only on relevant seating areas}{figure.caption.3}{}}
+\abx@aux@cite{0}{he2016resnet}
+\abx@aux@segm{0}{0}{he2016resnet}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The augmentation pipeline: (a) Original OK crop, (b) Masked inpainting using Telea algorithm, (c) Final synthetic KO sample with boundary blending.}}{6}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:triplet}{{4}{6}{The augmentation pipeline: (a) Original OK crop, (b) Masked inpainting using Telea algorithm, (c) Final synthetic KO sample with boundary blending}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Dataset Construction and Augmentation}{6}{subsection.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Model Architecture}{7}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Training Protocol}{8}{subsection.4.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Threshold Calibration}{8}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Training Protocol}{7}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Threshold Calibration and the Max + Margin Heuristic}{7}{subsection.4.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Empirical distribution of $P_{\mathrm  {KO}}$ for nominal validation images. The decision threshold $\tau $ is set using the Max OK + 15\% margin rule to ensure industrial-grade reliability and zero false alarms during initial deployment.}}{8}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:calibration}{{5}{8}{Empirical distribution of $P_{\mathrm {KO}}$ for nominal validation images. The decision threshold $\tau $ is set using the Max OK + 15\% margin rule to ensure industrial-grade reliability and zero false alarms during initial deployment}{figure.caption.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.7}Inference Workflow}{8}{subsection.4.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8}Design Rationale and Key Decisions}{9}{subsection.4.8}\protected@file@percent }
+\abx@aux@cite{0}{selvaraju2017gradcam}
+\abx@aux@segm{0}{0}{selvaraju2017gradcam}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Results and Performance Analysis}{9}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Overall Performance}{9}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Overall system performance.}}{9}{table.caption.5}\protected@file@percent }
-\newlabel{tab:overall}{{1}{9}{Overall system performance}{table.caption.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Overall system performance.}}{9}{table.caption.6}\protected@file@percent }
+\newlabel{tab:overall}{{1}{9}{Overall system performance}{table.caption.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Per-Connector Breakdown}{9}{subsection.5.2}\protected@file@percent }
-\citation{selvaraju2017gradcam}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Per-connector performance of the presence detector pipeline.}}{10}{table.caption.6}\protected@file@percent }
-\newlabel{tab:per_connector}{{2}{10}{Per-connector performance of the presence detector pipeline}{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Probability-Based Diagnostics}{10}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Error Analysis}{10}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Development Journey}{10}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Phase 1: PatchCore Baseline with ResNet18}{11}{subsection.6.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces PCA scatter plot of ResNet18 embeddings. OK samples (blue) form a broad manifold; KO samples (orange) shift slightly outside it; OCCLUSION (green) and PARTIAL OCCLUSION (red) overlap with the OK region.}}{11}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:pca}{{5}{11}{PCA scatter plot of ResNet18 embeddings. OK samples (blue) form a broad manifold; KO samples (orange) shift slightly outside it; OCCLUSION (green) and PARTIAL OCCLUSION (red) overlap with the OK region}{figure.caption.7}{}}
-\citation{roth2022patchcore}
-\citation{batzner2023efficientad}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Phase 2: EfficientAD Teacher-Student Framework}{12}{subsection.6.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces EfficientAD performance per connector (raw RGB modality).}}{13}{table.caption.8}\protected@file@percent }
-\newlabel{tab:efficientad_results}{{3}{13}{EfficientAD performance per connector (raw RGB modality)}{table.caption.8}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces EfficientAD confusion matrices. Perfect diagonal separation on conn1, conn5, conn7 and conn8. Conn9 shows 20 false positives; conn6 shows 3 missed defects.}}{14}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:efficientad_conf}{{6}{14}{EfficientAD confusion matrices. Perfect diagonal separation on conn1, conn5, conn7 and conn8. Conn9 shows 20 false positives; conn6 shows 3 missed defects}{figure.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Per-connector performance of the final deployed system. Metrics are pending recomputation with the final model configuration.}}{9}{table.caption.7}\protected@file@percent }
+\newlabel{tab:per_connector}{{2}{9}{Per-connector performance of the final deployed system. Metrics are pending recomputation with the final model configuration}{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Probability-Based Diagnostics}{9}{subsection.5.3}\protected@file@percent }
+\abx@aux@cite{0}{selvaraju2017gradcam}
+\abx@aux@segm{0}{0}{selvaraju2017gradcam}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Model Explainability}{10}{subsection.5.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Detailed visual analysis for a single connector sample. (a) Original crop, (b) Mask overlay, (c) Grad-CAM heatmap highlighting cable features, (d) Grad-CAM overlay on original image.}}{10}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:gradcam}{{6}{10}{Detailed visual analysis for a single connector sample. (a) Original crop, (b) Mask overlay, (c) Grad-CAM heatmap highlighting cable features, (d) Grad-CAM overlay on original image}{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Intermediate feature map activations from \texttt  {layer4}. The network encodes complex spatial relationships and textures within the PCL region.}}{11}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:fmaps}{{7}{11}{Intermediate feature map activations from \texttt {layer4}. The network encodes complex spatial relationships and textures within the PCL region}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Error Analysis}{11}{subsection.5.5}\protected@file@percent }
+\abx@aux@cite{0}{roth2022patchcore}
+\abx@aux@segm{0}{0}{roth2022patchcore}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Development Journey}{12}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Phase 1: PatchCore Baseline with ResNet18}{12}{subsection.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \relax }}{12}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:alignment}{{8}{12}{\relax }{figure.caption.10}{}}
+\abx@aux@cite{0}{batzner2023efficientad}
+\abx@aux@segm{0}{0}{batzner2023efficientad}
+\abx@aux@cite{0}{batzner2023efficientad}
+\abx@aux@segm{0}{0}{batzner2023efficientad}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Phase 2: EfficientAD Teacher-Student Framework}{13}{subsection.6.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Performance of initial EfficientAD baseline (Raw RGB). Note the failure modes in conn6 and conn9 which motivated the final Synthetic Negative approach.}}{14}{table.caption.11}\protected@file@percent }
+\newlabel{tab:efficientad_results}{{3}{14}{Performance of initial EfficientAD baseline (Raw RGB). Note the failure modes in conn6 and conn9 which motivated the final Synthetic Negative approach}{table.caption.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces EfficientAD confusion matrices. Perfect diagonal separation on conn1, conn5, conn7 and conn8. Conn9 shows 20 false positives; conn6 shows 3 missed defects.}}{14}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:efficientad_conf}{{9}{14}{EfficientAD confusion matrices. Perfect diagonal separation on conn1, conn5, conn7 and conn8. Conn9 shows 20 false positives; conn6 shows 3 missed defects}{figure.caption.12}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Key Insights Carried Forward}{15}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{15}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Why Synthetic Negatives Work}{15}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Per-Connector Models vs.\ Global Models}{15}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Threshold Calibration as Operational Control}{16}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Comparison with Prior Approaches}{16}{subsection.7.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Comparison of explored approaches.}}{16}{table.caption.10}\protected@file@percent }
-\newlabel{tab:comparison}{{4}{16}{Comparison of explored approaches}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Limitations and Future Improvements}{16}{subsection.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusions}{16}{section.8}\protected@file@percent }
-\bibcite{batzner2023efficientad}{1}
-\bibcite{rublee2011orb}{2}
-\bibcite{roth2022patchcore}{3}
-\bibcite{he2016resnet}{4}
-\bibcite{pizer1987clahe}{5}
-\bibcite{telea2004inpainting}{6}
-\bibcite{selvaraju2017gradcam}{7}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Acknowledgments}{17}{section.9}\protected@file@percent }
-\gdef \@abspage@last{18}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Software Implementation}{15}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Architecture}{15}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Graphical Interface}{16}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Console Reporting and Diagnostics}{16}{subsection.7.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Software output examples showing classification summary and prediction visualization.}}{16}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:software_examples}{{10}{16}{Software output examples showing classification summary and prediction visualization}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Deployment}{16}{subsection.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Discussion}{16}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Why Synthetic Negatives Work}{16}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Per-Connector Models vs.\ Global Models}{17}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Threshold Calibration as Operational Control}{17}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Comparison with Prior Approaches}{17}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}Limitations and Future Improvements}{17}{subsection.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusions}{18}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Acknowledgments}{18}{section.10}\protected@file@percent }
+\abx@aux@read@bbl@mdfivesum{E75D7E0DB03F09D45B25DF2F538BB294}
+\abx@aux@read@bblrerun
+\gdef \@abspage@last{19}
