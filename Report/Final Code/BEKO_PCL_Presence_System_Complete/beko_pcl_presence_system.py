@@ -5,6 +5,12 @@ Interfaccia grafica per analisi PCB connector con modelli PCL Presence Detection
 Basato su beko_detection_system.py ma usa i nuovi modelli di classificazione PCL.
 """
 
+
+
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -15,7 +21,10 @@ from PIL import Image, ImageTk
 from torchvision import transforms
 import numpy as np
 import cv2
+
 import json
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.patches import Rectangle, ConnectionPatch
@@ -448,11 +457,14 @@ class BekoPCLPresenceSystem:
                 self.reference_path = refs[0]
                 self.crop_box = None
         
+
         self.setup_ui()
         self.load_models()
         self.init_simulation_pool()
         self.print_threshold_info()
+
     
+
     def setup_ui(self):
         # Header con logo
         header_frame = tk.Frame(self.root, bg='#ffffff', height=80)
@@ -460,6 +472,7 @@ class BekoPCLPresenceSystem:
         header_frame.pack_propagate(False)
         
         header_content = tk.Frame(header_frame, bg='#ffffff')
+
         header_content.pack(fill=tk.BOTH, expand=True, padx=20, pady=12)
         
         # Logo sinistra (Politecnico)
@@ -561,11 +574,13 @@ class BekoPCLPresenceSystem:
             cursor='hand2',
             pady=20
         )
+
         upload_label.pack(fill=tk.X)
         
         upload_inner.drop_target_register(DND_FILES)
         upload_inner.dnd_bind('<<Drop>>', self.on_drop)
         upload_label.bind("<Button-1>", self.on_click_select)
+
         upload_inner.bind("<Button-1>", self.on_click_select)
         
         self.filename_label = tk.Label(
@@ -756,21 +771,30 @@ class BekoPCLPresenceSystem:
         )
         self.stats_text.pack(fill=tk.BOTH, expand=True)
         
+
         # RIGHT COLUMN - Main display
         right_panel = tk.Frame(main_frame, bg='#F5F5F5')
         right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        # Usiamo Label invece di Canvas per evitare crash Matplotlib Backend
+        self.plot_label = tk.Label(right_panel, bg='#F5F5F5', text="Visualization Disabled (Matplotlib Error)", font=("Arial", 14))
+        self.plot_label.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        self.fig = plt.figure(figsize=(16, 12), facecolor='#F5F5F5', dpi=100)
-        self.canvas = FigureCanvasTkAgg(self.fig, master=right_panel)
-        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        # self.fig = plt.figure(figsize=(12, 9), facecolor='#F5F5F5', dpi=100)
         
-        ax = self.fig.add_subplot(111, facecolor='#F5F5F5')
-        ax.text(0.5, 0.5, "Load an image to start analysis", 
-                ha='center', va='center', fontsize=12, color='#999999',
-                transform=ax.transAxes)
-        ax.axis('off')
-        self.canvas.draw()
+        # ax = self.fig.add_subplot(111, facecolor='#F5F5F5')
+        # ax.text(0.5, 0.5, "Load an image to start analysis", 
+        #         ha='center', va='center', fontsize=12, color='#999999',
+        #         transform=ax.transAxes)
+        # ax.axis('off')
+        
+        # self.update_plot_label()
     
+
+    def update_plot_label(self):
+        """Aggiorna il plot label convertendo la figure in immagine TK."""
+        return
+
     def load_models(self):
         """Carica i modelli PCL Presence addestrati."""
         try:
@@ -780,6 +804,7 @@ class BekoPCLPresenceSystem:
             # Carica occlusion model
             occ_path = self.models_dir / "occlusion_cnn.pth"
             if not occ_path.exists():
+
                 raise FileNotFoundError(f"Modello occlusion non trovato: {occ_path}")
             
             self.occ_model = OcclusionCNN().to(self.device)
@@ -979,10 +1004,16 @@ class BekoPCLPresenceSystem:
             self.root.after(0, lambda: self.status_label.config(text="Error", fg='#dc3545'))
             self.root.after(0, lambda: self.process_btn.config(state=tk.NORMAL))
     
+
     def visualize_results(self):
         """Visualizza i risultati."""
-        self.fig.clear()
-        self.fig.set_facecolor('#F5F5F5')
+        # Visualizzazione disabilitata per crash backend
+        self.update_statistics()
+        return
+        
+        # self.fig.clear()
+        # self.fig.set_facecolor('#F5F5F5')
+
         
         # Layout: top area (conn1-5), board centrale, bottom area (conn6-9)
         gs = GridSpec(3, 1, figure=self.fig, 
@@ -1002,7 +1033,10 @@ class BekoPCLPresenceSystem:
         # Renderizza immagini ingrandite con frecce dalla board schematic
         self.render_zoomed_crops_with_arrows()
         
-        self.canvas.draw()
+
+        # self.canvas.draw()
+        self.update_plot_label()
+
         self.update_statistics()
     
     def generate_board_schematic(self, aligned_image, roi_config):
@@ -1599,7 +1633,10 @@ class BekoPCLPresenceSystem:
         self.process_image()
     
 
+
 def main():
+    import sys
+    import traceback
     try:
         import tkinterdnd2
     except ImportError:
@@ -1608,10 +1645,25 @@ def main():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "tkinterdnd2"])
         import tkinterdnd2
     
-    root = TkinterDnD.Tk()
-    app = BekoPCLPresenceSystem(root)
-    root.mainloop()
+    try:
+        root = TkinterDnD.Tk()
+        app = BekoPCLPresenceSystem(root)
+        root.mainloop()
+    except Exception as e:
+        traceback.print_exc()
+        raise e
+
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+
+    except Exception as e:
+        with open("error_log.txt", "w") as f:
+            import traceback
+            traceback.print_exc(file=f)
+        print("ERROR LOGGED TO error_log.txt")
+
+
 

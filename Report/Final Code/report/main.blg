@@ -1,23 +1,15 @@
 [0] Config.pm:328> INFO - This is Biber 2.21
 [0] Config.pm:331> INFO - Logfile is 'main.blg'
-[145] biber-MSWIN64:342> INFO - === 
-[176] Biber.pm:421> INFO - Reading 'main.bcf'
-[268] Biber.pm:1002> INFO - Found 7 citekeys in bib section 0
-[280] Biber.pm:4487> INFO - Processing section 0
-[291] Biber.pm:4678> INFO - Looking for bibtex file 'references.bib' for section 0
-[651] bibtex.pm:1713> INFO - LaTeX decoding ...
-[668] bibtex.pm:1519> INFO - Found BibTeX data source 'C:/Users/Karim Negm/AppData/Local/Programs/MiKTeX/bibtex/bib/feupphdteses/references.bib'
-[686] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[686] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[686] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'en-US'
-[686] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
-[687] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
-[687] bbl.pm:779> INFO - Output to main.bbl
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'anand2020guide' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'pizer1987clahe' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'telea2004inpainting' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'batzner2023efficientad' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'he2016resnet' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'selvaraju2017gradcam' (section 0)
-[687] Biber.pm:132> WARN - I didn't find a database entry for 'roth2022patchcore' (section 0)
-[687] Biber.pm:134> INFO - WARNINGS: 7
+[266] biber-MSWIN64:342> INFO - === 
+[369] Biber.pm:421> INFO - Reading 'main.bcf'
+[479] Biber.pm:1002> INFO - Found 5 citekeys in bib section 0
+[494] Biber.pm:4487> INFO - Processing section 0
+[517] Biber.pm:4678> INFO - Looking for bibtex file 'references.bib' for section 0
+[572] bibtex.pm:1713> INFO - LaTeX decoding ...
+[596] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
+[708] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[708] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[708] Biber.pm:4307> INFO - Sorting list 'none/global//global/global/global' of type 'entry' with template 'none' and locale 'en-US'
+[708] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[712] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[716] bbl.pm:779> INFO - Output to main.bbl
